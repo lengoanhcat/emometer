@@ -1,0 +1,131 @@
+<html>
+<head>
+    <title>EmoMeter JavaScript Demo</title>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="demo/css/bootstrap-darkly.min.css" />
+    <link href="demo/css/demo.css" rel="stylesheet" type="text/css" />
+
+    <!-- outside vendor files -->
+    <script src="demo/js/vendor/jquery-2.1.4.js"></script>
+    <script src="demo/js/vendor/d3.min.js"></script>   
+
+    <!-- demo files -->
+    <script src="demo/js/run_demo.js"></script>
+    <script src="https://download.affectiva.com/js/3.2/affdex.js"></script>
+
+    <a href="http://neuromarketingvn.wordpress.com" target="_blank"><img style="position: absolute; top: 30; right: 70; border: 0;" src="emometer_logo_1.png" height="60" width="220"></a>
+</head>
+
+<body class="container">
+<div id="text-width"></div>
+<div id="lightbox"></div>
+<div id="demo-setup">
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <div id="facevideo-node"></div>            
+        </div>
+    </div>
+    <div id="messages" class="row">
+        <div class="col-md-6 col-md-offset-3 demo-message" id="msg-starting-webcam">
+            <div class="alert alert-info" role="alert">Kết nối với webcam...</div>
+        </div>
+        <div class="col-md-6 col-md-offset-3 demo-message" id="msg-webcam-failure">
+            <div class="alert alert-danger" role="alert"><strong>Lỗi: </strong>Không kết nối được với webcam.</div>
+        </div>
+        <div class="col-md-6 col-md-offset-3 demo-message" id="msg-detector-status">
+          <div class="alert alert-info" role="alert">Khởi động chương trình khám phá cảm xúc, bạn vui lòng chờ trong giây lát ...
+            </div>
+        </div>
+        <div class="col-md-6 col-md-offset-3 demo-message" id="msg-bad-url">
+          <div class="alert alert-warning" role="alert"><strong>Error: </strong>Xin vui lòng nhập Youtube URL hoặc từ khóa của bạn.</div>
+        </div>
+        <div class="col-md-6 col-md-offset-3 demo-message" id="msg-short-video">
+            <div class="alert alert-warning" role="alert"><strong>Error: </strong>Clip YouTube này quá ngắn.</div>
+        </div>
+        <div class="col-md-8 col-md-offset-2" id="instructions">
+            <div class="well">
+                <p><strong>Chào mừng !</strong> đến với chương trình nhận diện cảm xúc EmoMeter của NeuroMarketing-VN</p>
+                <!-- <p>Phien ban chay thu nay dua tren nen cong inghe JavaScript de phan tich cam xuc khi ban xem mot doan YouTube. Truoc khi ban thu chuong trinh nay, xin vui long kiem tra xem phong co du sang khong.</p> -->
+                <p><strong>Hướng dẫn:</strong></p>
+                <p>Tìm kiếm clip YouTube bằng từ khóa hoặc nhập địa chỉ URL. Khi webcam của bạn được khởi động, bạn sẽ thấy đồ thị cảm xúc trong quá trình xem video. Đặc biệt, bạn có thể xem lại những tiểu đoạn quảng cáo làm bạn hứng thú</p>
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="start-form" placeholder="Nhập Youtube URL hoặc từ khóa vào đây..." autofocus>
+                        <span class="input-group-btn">
+                            <button id="btn-start" class="btn btn-primary" type="button" onclick="">Bắt đầu</button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="list-group row" id="search-results"></div>
+
+            <div class="well">
+                <p>Dưới đây là một số đoạn video clip quảng cáo trên YouTube:</p>
+                <div class="row">
+                    <div class="col-md-4 starter-container" id="example-0"></div>
+                    <div class="col-md-4 starter-container" id="example-1"></div>
+                    <div class="col-md-4 starter-container" id="example-2"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 starter-container" id="example-3"></div>
+                    <div class="col-md-4 starter-container" id="example-4"></div>
+                    <div class="col-md-4 starter-container" id="example-5"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="row" id="video-container">
+    <div class="col-md-12 text-center">
+    <!-- Original Video-clip display only youtube videos -->
+<!--     <div id="player" style="pointer-events: none"></div>   -->
+    <!-- Add faducial points display alongside video clips -->
+    <!-- This is only activated for demo / debug and not release-->
+       <div class="col-md-12 text-center" id="video-display">
+            <div class="col-md-8 text-center" id="player" style="pointer-events: none"></div>     
+            <script>
+                document.getElementById('facevideo-node').class="col-md-4 text-center"
+                document.getElementById('facevideo-node').style="width:170px;height:120px;"                 
+                document.getElementById('video-display').appendChild(                
+                document.getElementById('facevideo-node'));              
+            </script>
+        </div>        
+        <div id="svg-container">
+            <div class="row">
+                <div id="ul-wrapper" class="col-md-2">
+                    <ul id="nav">
+                    <li class="all buttons all-face all-box box-squared" id="all"><span>Tất cả</span></li>
+                    <li class="joy buttons smiling-face joy-box box-squared" id="joy" onClick="JSSDKDemo.responses(this.id)"><span>Vui mừng</span></li>
+                    <li class="anger buttons angry-face anger-box box-squared" id="anger" onClick="JSSDKDemo.responses(this.id)"><span>Giận dữ</span></li>
+                    <li class="disgust buttons disgusted-face disgust-box box-squared" id="disgust"  onClick="JSSDKDemo.responses(this.id)"><span>Ghê tởm</span></li>
+                    <li class="contempt buttons contempt-face contempt-box box-squared" id="contempt"  onClick="JSSDKDemo.responses(this.id)"><span>Nghi ngờ</span></li>
+                    <li class="surprise buttons surprise-face surprise-box box-squared" id="surprise"  onClick="JSSDKDemo.responses(this.id)"><span>Ngạc nhiên</span></li>                                     
+                    <li class="engagement buttons engagement-face engagement-box box-squared" id="engagement"  onClick="JSSDKDemo.responses(this.id)"><span>Chú ý</span></li>
+                    <li class="valence buttons valence-face valence-box box-squared" id="valence"  onClick="JSSDKDemo.responses(this.id)"><span>Thái độ</span></li>                      
+                    </ul>
+                </div>
+                <div id="svg-wrapper" class="col-md-8 text-center">
+                    <svg id="svg-curve"></svg>
+                </div>
+
+                <div id="play-again" class="col-md-2">
+                  <div class="well">
+                    <p>Đã quay xong!</p>
+                    <p id="res1"></p>
+                    <p><small>Xem lại đoạn phim và đồ thị cảm xúc.</small></p>
+                    <p>&nbsp;</p>
+                    <button id="btn-play-again" class="btn btn-primary">Ok, đã hiểu.</button>
+                  </div>
+                </div>   
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
